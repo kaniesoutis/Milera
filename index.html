@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MILERA — Locally Abroad</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #040914;
+      --bg-soft: #07101f;
+      --white: #f8fafc;
+      --muted: rgba(248, 250, 252, 0.64);
+      --line: rgba(248, 250, 252, 0.82);
+      --green: #95ff19;
+      --logo-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --body-font: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--body-font);
+      font-weight: 500;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.055), transparent 30%),
+        radial-gradient(circle at 50% 68%, rgba(149, 255, 25, 0.052), transparent 24%),
+        linear-gradient(180deg, var(--bg), var(--bg-soft));
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.05;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      width: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+
+    .light-orb {
+      position: absolute;
+      width: 460px;
+      height: 460px;
+      left: var(--mouse-x, 50%);
+      top: var(--mouse-y, 50%);
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      opacity: 0.62;
+      transition: left 160ms ease, top 160ms ease;
+      background: radial-gradient(circle, rgba(149, 255, 25, 0.08), rgba(149, 255, 25, 0.018) 38%, transparent 68%);
+    }
+
+    header,
+    footer {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 30px;
+      color: rgba(248, 250, 252, 0.56);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.075em;
+      text-transform: uppercase;
+    }
+
+    .live {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 20px rgba(149, 255, 25, 0.8);
+      animation: pulse 1.9s ease-in-out infinite;
+    }
+
+    main {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      padding: 30px 18px;
+    }
+
+    .hero {
+      width: min(560px, 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .logo {
+      font-family: var(--logo-font);
+      font-size: clamp(46px, 7.2vw, 82px);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.035em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: rise 900ms cubic-bezier(0.2, 0.82, 0.2, 1) 80ms forwards;
+    }
+
+    .badge {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 18px;
+      padding: 2px;
+      border-radius: 999px;
+      color: var(--green);
+      background: conic-gradient(from var(--angle), var(--green), rgba(255, 255, 255, 0.95), rgba(149, 255, 25, 0.2), var(--green));
+      box-shadow: 0 0 0 8px rgba(149, 255, 25, 0.025), 0 0 32px rgba(149, 255, 25, 0.12);
+      opacity: 0;
+      transform: translateY(12px);
+      animation:
+        rise 850ms cubic-bezier(0.2, 0.82, 0.2, 1) 260ms forwards,
+        badgeBorder 4.2s linear infinite;
+    }
+
+    .badge span {
+      display: block;
+      padding: 5px 15px 6px;
+      border-radius: 999px;
+      background: #040914;
+      font-family: var(--body-font);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.012em;
+    }
+
+    .copy {
+      max-width: 330px;
+      margin-top: 32px;
+      color: rgba(248, 250, 252, 0.92);
+      font-size: clamp(14px, 1.6vw, 17px);
+      line-height: 1.3;
+      letter-spacing: -0.018em;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: rise 850ms cubic-bezier(0.2, 0.82, 0.2, 1) 440ms forwards;
+    }
+
+    .chips {
+      width: min(390px, 100%);
+      margin-top: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 13px 14px;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: rise 850ms cubic-bezier(0.2, 0.82, 0.2, 1) 620ms forwards;
+    }
+
+    .chip {
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 18px 9px;
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.012);
+      font-family: var(--body-font);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.012em;
+      cursor: pointer;
+      transition:
+        transform 220ms ease,
+        border-color 220ms ease,
+        color 220ms ease,
+        background 220ms ease,
+        box-shadow 220ms ease;
+    }
+
+    .chip:hover,
+    .chip.active {
+      transform: translateY(-2px);
+      border-color: var(--green);
+      color: var(--green);
+      background: rgba(149, 255, 25, 0.075);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .info {
+      width: min(390px, 100%);
+      min-height: 60px;
+      margin-top: 24px;
+      display: grid;
+      place-items: center;
+      padding: 15px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 22px;
+      color: var(--muted);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.018));
+      backdrop-filter: blur(18px);
+      font-size: 13px;
+      line-height: 1.38;
+      letter-spacing: -0.006em;
+    }
+
+    .cta-area {
+      margin-top: 36px;
+      display: grid;
+      place-items: center;
+      gap: 15px;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: rise 850ms cubic-bezier(0.2, 0.82, 0.2, 1) 820ms forwards;
+    }
+
+    .cta {
+      border: 0;
+      color: var(--green);
+      background: transparent;
+      font-family: var(--logo-font);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      cursor: pointer;
+      transition: transform 250ms ease, text-shadow 250ms ease;
+    }
+
+    .cta::before {
+      content: "[ ";
+    }
+
+    .cta::after {
+      content: " ]";
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      text-shadow: 0 0 25px rgba(149, 255, 25, 0.68);
+    }
+
+    .form {
+      width: min(380px, calc(100vw - 52px));
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(18px);
+      opacity: 0;
+      transform: translateY(9px) scale(0.985);
+      pointer-events: none;
+      transition: opacity 300ms ease, transform 300ms ease;
+    }
+
+    .form.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      padding: 0 14px;
+      color: var(--white);
+      background: transparent;
+      font-family: var(--body-font);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    input::placeholder {
+      color: rgba(248, 250, 252, 0.38);
+    }
+
+    .submit {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      color: #08111f;
+      background: var(--green);
+      font-family: var(--body-font);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      cursor: pointer;
+      transition: transform 200ms ease, filter 200ms ease;
+    }
+
+    .submit:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .status {
+      min-height: 16px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    @property --angle {
+      syntax: "<angle>";
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    @keyframes badgeBorder {
+      to {
+        --angle: 360deg;
+      }
+    }
+
+    @keyframes rise {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.55);
+        opacity: 0.55;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        overflow-y: auto;
+      }
+
+      header,
+      footer {
+        padding: 18px;
+        font-size: 10px;
+      }
+
+      header span:last-child,
+      footer span:last-child {
+        display: none;
+      }
+
+      main {
+        padding: 26px 16px;
+      }
+
+      .logo {
+        font-size: clamp(44px, 14.5vw, 64px);
+        letter-spacing: -0.032em;
+      }
+
+      .copy {
+        margin-top: 28px;
+      }
+
+      .chips {
+        width: min(305px, 100%);
+        margin-top: 30px;
+        gap: 11px;
+      }
+
+      .chip {
+        padding: 8px 15px;
+        font-size: 13px;
+      }
+
+      .info {
+        font-size: 12px;
+      }
+
+      .form {
+        grid-template-columns: 1fr;
+        border-radius: 22px;
+      }
+
+      input {
+        min-height: 42px;
+        text-align: center;
+      }
+
+      .submit {
+        width: 100%;
+      }
+
+      .light-orb {
+        width: 280px;
+        height: 280px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page" id="page">
+    <div class="light-orb" aria-hidden="true"></div>
+
+    <header>
+      <span class="live"><span class="dot"></span> Early access</span>
+      <span>DFW / Global Nepali community</span>
+    </header>
+
+    <main>
+      <section class="hero" aria-label="MILERA landing page">
+        <h1 class="logo">MILERA</h1>
+
+        <div class="badge">
+          <span>Locally Abroad</span>
+        </div>
+
+        <p class="copy">
+          Everything for life abroad.<br />
+          Built in one trusted space.
+        </p>
+
+        <div class="chips" aria-label="MILERA categories">
+          <button class="chip" type="button" data-text="Rooms, roommates, subleases, and trusted housing leads from your own community.">Housing</button>
+          <button class="chip" type="button" data-text="Buy, sell, exchange, and discover useful things around you without random noisy groups.">Marketplace</button>
+          <button class="chip" type="button" data-text="Local jobs, part-time work, gigs, and community opportunities for life abroad.">Jobs</button>
+          <button class="chip" type="button" data-text="Ask, vote, comment, recommend, and help each other settle faster in a new place.">Community</button>
+          <button class="chip" type="button" data-text="Airport pickup, moving help, tax support, local services, and trusted people nearby.">Services</button>
+        </div>
+
+        <div class="info" id="info">
+          Tap a category to preview what MILERA will help with.
+        </div>
+
+        <div class="cta-area">
+          <button class="cta" id="toggleForm" type="button">Request Early Access</button>
+
+          <form class="form" id="form">
+            <input type="email" id="email" placeholder="Enter your email" required />
+            <button class="submit" type="submit">Join Waitlist</button>
+          </form>
+
+          <div class="status" id="status" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Browse first. Sign in when ready.</span>
+      <span>Housing · Market · Jobs · Community</span>
+    </footer>
+  </div>
+
+  <script>
+    const page = document.getElementById("page");
+    const chips = document.querySelectorAll(".chip");
+    const info = document.getElementById("info");
+    const toggleForm = document.getElementById("toggleForm");
+    const form = document.getElementById("form");
+    const email = document.getElementById("email");
+    const status = document.getElementById("status");
+
+    page.addEventListener("mousemove", function (event) {
+      const rect = page.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+      page.style.setProperty("--mouse-x", x + "%");
+      page.style.setProperty("--mouse-y", y + "%");
+    });
+
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        chips.forEach(function (item) {
+          item.classList.remove("active");
+        });
+
+        chip.classList.add("active");
+        info.textContent = chip.dataset.text;
+      });
+    });
+
+    toggleForm.addEventListener("click", function () {
+      form.classList.toggle("open");
+      status.textContent = "";
+
+      if (form.classList.contains("open")) {
+        setTimeout(function () {
+          email.focus();
+        }, 160);
+      }
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const value = email.value.trim();
+      if (!value) return;
+
+      const savedEmails = JSON.parse(localStorage.getItem("milera_waitlist") || "[]");
+
+      if (!savedEmails.includes(value)) {
+        savedEmails.push(value);
+      }
+
+      localStorage.setItem("milera_waitlist", JSON.stringify(savedEmails));
+      status.textContent = "You are on the early access list.";
+      email.value = "";
+    });
+  </script>
+</body>
+</html>
